@@ -1,0 +1,19 @@
+<Window x:Class="NullAI.Views.VoiceTrainingWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Train Voice Command" Height="200" Width="300">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <TextBlock Text="Phrase:" Grid.Row="0" />
+        <TextBox x:Name="PhraseBox" Grid.Row="1" Margin="0,5,0,10" />
+        <TextBlock Text="Response:" Grid.Row="2" />
+        <TextBox x:Name="ResponseBox" Grid.Row="3" Margin="0,5,0,10" />
+        <Button Content="Save" Grid.Row="4" Width="75" HorizontalAlignment="Right" Click="Save_Click" />
+    </Grid>
+</Window>

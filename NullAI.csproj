@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+    <ApplicationIcon>Resources/app_icon.ico</ApplicationIcon>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\default_model.obj" />
+    <None Include="Resources\app_icon.ico" />
+    <!-- WPF Page items are implicitly included by the SDK; explicit entries removed -->
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Speech" Version="6.0.0" />
+    <PackageReference Include="Microsoft.CognitiveServices.Speech" Version="1.36.0" />
+  </ItemGroup>
+</Project>
