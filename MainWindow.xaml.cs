@@ -28,6 +28,7 @@ namespace NullAI
         public MainWindow()
         {
             InitializeComponent();
+            Title = $"{Constants.ApplicationName} ({PlatformHelper.GetExecutableName()})";
             _apiKeyManager = new ApiKeyManager();
             _aiService = new AIService(_apiKeyManager);
             _speechService = new SpeechService();
