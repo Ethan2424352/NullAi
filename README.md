@@ -13,17 +13,17 @@ More documentation will be added in the future.
 
 ## How to Use
 1. Install the .NET SDK with the Windows Desktop workload.
-2. Restore and build the project:
+2. Restore and build the project (add `-p:EnableWindowsTargeting=true` when building on Linux):
    ```
-   dotnet restore
-   dotnet build
+   dotnet restore -p:EnableWindowsTargeting=true
+   dotnet build -p:EnableWindowsTargeting=true
    ```
 3. Run the application:
    ```
    dotnet run
    ```
 4. Provide any required API keys in the settings window.
-   OpenCV runtime dependencies are restored automatically for Windows and Ubuntu 20.04+ using OS-specific packages during this step.
+   OpenCV runtime dependencies are restored automatically for Windows 11 and Ubuntu 24.04.2 LTS (kernel 6.12.13) using OS-specific packages during this step.
 
 ## How It Works
 The main window hosts several features:
@@ -37,5 +37,9 @@ The main window hosts several features:
 These services are coordinated by `MainWindow` and use helper classes such as `ApiKeyManager` and `CustomVoiceCommand`.
 
 ## API Keys
-API keys are stored using `ApiKeyManager` and persisted to the user's application data directory via `SecureStorage`. See `API_KEYS.md` for details. A helper script `Scripts/test_api_key.py` can be used to verify that the `OPENAI_API_KEY` environment variable is set and reachable.
+API keys are stored using `ApiKeyManager` and persisted to the user's application data directory via `SecureStorage`. See `API_KEYS.md` for details. A helper script `Scripts/test_api_key.py` can be used to verify that the `OPENAI_API_KEY` environment variable is set and reachable:
+
+```
+python3 Scripts/test_api_key.py
+```
 
