@@ -1,5 +1,46 @@
 NullAI
 ======
+## עברית
+
+מאגר זה מכיל יישום WPF בשם NullAI.
+תיעוד נוסף יתווסף בעתיד.
+
+### איך להוריד
+- שכפלו את המאגר:
+  ```
+  git clone https://github.com/your-username/NullAi.git
+  ```
+- לחלופין, הורידו את קובץ ה-ZIP מדף המאגר וחלצו אותו.
+
+### איך להשתמש
+1. התקינו את ערכת הפיתוח של .NET עם עומס העבודה "Windows Desktop".
+2. שחזרו ובנו את הפרויקט (הוסיפו `-p:EnableWindowsTargeting=true` בעת בנייה בלינוקס):
+   ```
+   dotnet restore -p:EnableWindowsTargeting=true
+   dotnet build -p:EnableWindowsTargeting=true
+   ```
+3. הריצו את היישום:
+   ```
+   dotnet run
+   ```
+4. ספקו כל מפתח API נדרש בחלון ההגדרות.
+   התלויות של OpenCV למערכת ההפעלה משוחזרות אוטומטית עבור Windows 11 ו-Ubuntu 24.04.2 LTS (קרנל 6.12.13) באמצעות חבילות ייחודיות למערכת במהלך שלב זה.
+
+### איך זה עובד
+החלון הראשי מאחסן מספר תכונות:
+- **צ'אט בינה מלאכותית** – שלחו בקשות טקסט או קול המעובדות על ידי `AIService`.
+- **קנבס ציור** – ציירו ישירות על הקנבס באמצעות `DrawingService`.
+- **מחולל מודלים תלת־ממדיים** – תארו אובייקט ו-`Model3DService` מייצא מודלים בפורמט `.obj` או `.stl`.
+- **פקודות קוליות** – `SpeechService` מקשיב לפקודות ומפעיל תגובות מותאמות או מאומנות דרך `VoiceTrainingService`.
+- **זיהוי נוכחות** – זיהוי באמצעות מצלמת רשת (אופציונלי) תוך שימוש ב-OpenCV.
+- **בקרות פרטיות** – `PrivacyService` שומר העדפות משתמש לשימוש במיקרופון ומצלמת רשת.
+
+השירותים הללו מתואמים על ידי `MainWindow` ומשתמשים במחלקות עזר כמו `ApiKeyManager` ו-`CustomVoiceCommand`.
+
+### מפתחות API
+מפתחות API נשמרים באמצעות `ApiKeyManager` ונשמרים בספריית נתוני היישום של המשתמש דרך `SecureStorage`. ראו `API_KEYS.md` לפרטים. סקריפט עזר `Scripts/test_api_key.py` ניתן לשימוש כדי לוודא שמשתנה הסביבה `OPENAI_API_KEY` מוגדר ונגיש:
+
+
 
 ## English
 
@@ -45,47 +86,8 @@ API keys are stored using `ApiKeyManager` and persisted to the user's applicatio
 python3 Scripts/test_api_key.py
 ```
 
-## עברית
 
-מאגר זה מכיל יישום WPF בשם NullAI.
-תיעוד נוסף יתווסף בעתיד.
-
-### איך להוריד
-- שכפלו את המאגר:
-  ```
-  git clone https://github.com/your-username/NullAi.git
-  ```
-- לחלופין, הורידו את קובץ ה-ZIP מדף המאגר וחלצו אותו.
-
-### איך להשתמש
-1. התקינו את ערכת הפיתוח של .NET עם עומס העבודה "Windows Desktop".
-2. שחזרו ובנו את הפרויקט (הוסיפו `-p:EnableWindowsTargeting=true` בעת בנייה בלינוקס):
-   ```
-   dotnet restore -p:EnableWindowsTargeting=true
-   dotnet build -p:EnableWindowsTargeting=true
-   ```
-3. הריצו את היישום:
-   ```
-   dotnet run
-   ```
-4. ספקו כל מפתח API נדרש בחלון ההגדרות.
-   התלויות של OpenCV למערכת ההפעלה משוחזרות אוטומטית עבור Windows 11 ו-Ubuntu 24.04.2 LTS (קרנל 6.12.13) באמצעות חבילות ייחודיות למערכת במהלך שלב זה.
-
-### איך זה עובד
-החלון הראשי מאחסן מספר תכונות:
-- **צ'אט בינה מלאכותית** – שלחו בקשות טקסט או קול המעובדות על ידי `AIService`.
-- **קנבס ציור** – ציירו ישירות על הקנבס באמצעות `DrawingService`.
-- **מחולל מודלים תלת־ממדיים** – תארו אובייקט ו-`Model3DService` מייצא מודלים בפורמט `.obj` או `.stl`.
-- **פקודות קוליות** – `SpeechService` מקשיב לפקודות ומפעיל תגובות מותאמות או מאומנות דרך `VoiceTrainingService`.
-- **זיהוי נוכחות** – זיהוי באמצעות מצלמת רשת (אופציונלי) תוך שימוש ב-OpenCV.
-- **בקרות פרטיות** – `PrivacyService` שומר העדפות משתמש לשימוש במיקרופון ומצלמת רשת.
-
-השירותים הללו מתואמים על ידי `MainWindow` ומשתמשים במחלקות עזר כמו `ApiKeyManager` ו-`CustomVoiceCommand`.
-
-### מפתחות API
-מפתחות API נשמרים באמצעות `ApiKeyManager` ונשמרים בספריית נתוני היישום של המשתמש דרך `SecureStorage`. ראו `API_KEYS.md` לפרטים. סקריפט עזר `Scripts/test_api_key.py` ניתן לשימוש כדי לוודא שמשתנה הסביבה `OPENAI_API_KEY` מוגדר ונגיש:
-
-```
 python3 Scripts/test_api_key.py
+```
 ```
 
