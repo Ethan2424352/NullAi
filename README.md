@@ -28,8 +28,13 @@ More documentation will be added in the future.
 The main window hosts several features:
 - **AI Chat** – send text or voice prompts that are processed by `AIService`.
 - **Drawing Canvas** – sketch directly on the canvas through `DrawingService`.
-- **3D Model Generator** – describe an object and `Model3DService` exports an `.obj` model.
-- **Voice Commands** – `SpeechService` listens for commands and triggers custom responses.
+- **3D Model Generator** – describe an object and `Model3DService` exports models in `.obj` or `.stl` format.
+- **Voice Commands** – `SpeechService` listens for commands and triggers custom or trained responses via `VoiceTrainingService`.
+- **Presence Detection** – optional webcam-based detection using OpenCV.
+- **Privacy Controls** – `PrivacyService` stores user preferences for microphone and webcam usage.
 
 These services are coordinated by `MainWindow` and use helper classes such as `ApiKeyManager` and `CustomVoiceCommand`.
+
+## API Keys
+API keys are stored using `ApiKeyManager` and persisted to the user's application data directory via `SecureStorage`. See `API_KEYS.md` for details. A helper script `Scripts/test_api_key.py` can be used to verify that the `OPENAI_API_KEY` environment variable is set and reachable.
 

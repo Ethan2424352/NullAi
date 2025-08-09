@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -25,7 +23,7 @@ namespace NullAI
         private readonly SpeechService _speechService;
         private readonly DrawingService _drawingService;
         private readonly Model3DService _model3DService;
-        private readonly List<CustomVoiceCommand> _voiceCommands;
+        private readonly VoiceTrainingService _voiceTrainingService;
 
         public MainWindow()
         {
@@ -35,10 +33,11 @@ namespace NullAI
             _speechService = new SpeechService();
             _drawingService = new DrawingService();
             _model3DService = new Model3DService();
-            _voiceCommands = new List<CustomVoiceCommand>();
+            _voiceTrainingService = new VoiceTrainingService();
             // Attach drawing canvas events
             _drawingService.AttachCanvas(DrawingCanvas);
             // Subscribe to speech commands
+            _speechService.SetTrainingService(_voiceTrainingService);
             _speechService.CommandRecognized += SpeechService_CommandRecognized;
             _speechService.StartListening();
         }
@@ -51,14 +50,13 @@ namespace NullAI
             if (string.IsNullOrWhiteSpace(text)) return;
             InputBox.Clear();
             AppendChat($"You: {text}\n");
-            // Check if it matches a trained voice command
-            var custom = _voiceCommands.FirstOrDefault(c => text.StartsWith(c.Phrase, StringComparison.OrdinalIgnoreCase));
-            if (custom != null)
-            {
-                AppendChat($"NullAI: {custom.Response}\n");
-                return;
-            }
-            // Otherwise call AI service
+              // Check if it matches a trained voice command
+              if (_voiceTrainingService.TryGetResponse(text, out var customResponse))
+              {
+                  AppendChat($"NullAI: {customResponse}\n");
+                  return;
+              }
+              // Otherwise call AI service
             var response = await _aiService.ProcessCommandAsync(text);
             AppendChat($"NullAI: {response}\n");
         }
@@ -76,16 +74,17 @@ namespace NullAI
             {
                 // Prepend recognized command into chat
                 AppendChat($"Voice: {obj}\n");
-                var custom = _voiceCommands.FirstOrDefault(c => obj.StartsWith(c.Phrase, StringComparison.OrdinalIgnoreCase));
-                if (custom != null)
-                {
-                    AppendChat($"NullAI: {custom.Response}\n");
-                    return;
-                }
-                var response = await _aiService.ProcessCommandAsync(obj);
-                AppendChat($"NullAI: {response}\n");
-            });
-        }
+                  if (_voiceTrainingService.TryGetResponse(obj, out var customResponse))
+                  {
+                      AppendChat($"NullAI: {customResponse}\n");
+                  }
+                  else
+                  {
+                      var response = await _aiService.ProcessCommandAsync(obj);
+                      AppendChat($"NullAI: {response}\n");
+                  }
+              });
+          }
 
         private async void GenerateModel_Click(object sender, RoutedEventArgs e)
         {
@@ -125,11 +124,11 @@ namespace NullAI
 
         private void TrainVoice_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new VoiceTrainingWindow(cmd =>
-            {
-                _voiceCommands.Add(cmd);
-                AppendChat($"Voice command '{cmd.Phrase}' added.\n");
-            });
+              var dialog = new VoiceTrainingWindow(cmd =>
+              {
+                  _voiceTrainingService.TrainCommand(cmd.Phrase, cmd.Response);
+                  AppendChat($"Voice command '{cmd.Phrase}' added.\n");
+              });
             dialog.Owner = this;
             dialog.ShowDialog();
         }
