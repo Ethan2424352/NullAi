@@ -19,6 +19,7 @@
     <PackageReference Include="System.Speech" Version="6.0.0" />
     <PackageReference Include="Microsoft.CognitiveServices.Speech" Version="1.36.0" />
     <PackageReference Include="OpenCvSharp4" Version="4.8.0.20230708" />
+    <!-- Use OS-specific runtimes to ensure native binaries are available on each platform -->
     <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.8.0.20230708" Condition="$([MSBuild]::IsOSPlatform('Windows'))" />
     <PackageReference Include="OpenCvSharp4.runtime.ubuntu.20.04-x64" Version="4.8.0.20230708" Condition="$([MSBuild]::IsOSPlatform('Linux'))" />
   </ItemGroup>
