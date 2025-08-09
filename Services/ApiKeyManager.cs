@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using NullAI.Models;
 using NullAI.Utilities;
+using System.Linq;
 
 namespace NullAI.Services
 {
@@ -59,6 +60,14 @@ namespace NullAI.Services
         public void Save()
         {
             SecureStorage.SaveKeys(_keys);
+        }
+
+        /// <summary>
+        /// Retrieve the first API key or <c>null</c> if none exist.
+        /// </summary>
+        public string? GetPrimaryKey()
+        {
+            return _keys.FirstOrDefault()?.Key;
         }
     }
 }
