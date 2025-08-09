@@ -23,6 +23,7 @@ More documentation will be added in the future.
    dotnet run
    ```
 4. Provide any required API keys in the settings window.
+   OpenCV runtime dependencies are restored automatically for Windows and Ubuntu 20.04+ during this step.
 
 ## How It Works
 The main window hosts several features:
