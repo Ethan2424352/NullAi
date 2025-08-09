@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using NullAI.Services;
 
@@ -32,8 +31,7 @@ namespace NullAI.Services
             // production system you might differentiate keys by provider
             // using metadata on ApiKeyConfig.  Here we assume all keys are
             // OpenAI keys for simplicity.
-            var apiKeyConfig = _keyManager.Keys.FirstOrDefault();
-            var apiKey = apiKeyConfig?.Key;
+            var apiKey = _keyManager.GetPrimaryKey();
             if (!string.IsNullOrWhiteSpace(apiKey))
             {
                 try

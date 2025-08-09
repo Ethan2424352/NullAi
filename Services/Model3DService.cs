@@ -17,6 +17,12 @@ namespace NullAI.Services
     {
         private const string ResourcePrefix = "NullAI.Resources";
 
+        public enum ModelFormat
+        {
+            Obj,
+            Stl
+        }
+
         /// <summary>
         /// Extract the embedded default model to a temporary file and
         /// return its path.
@@ -33,33 +39,51 @@ namespace NullAI.Services
         }
 
         /// <summary>
-        /// Generate a simple 3D model (OBJ format) based on a text
-        /// description.
+        /// Generate a simple 3D model based on a text description in the
+        /// requested format. Currently supports OBJ and ASCII STL.
         /// </summary>
-        /// <param name="description">User description.</param>
-        /// <param name="outputPath">File path to write the OBJ file.</param>
-        public async Task GenerateModelAsync(string description, string outputPath)
+        public async Task GenerateModelAsync(string description, string outputPath, ModelFormat format = ModelFormat.Obj)
         {
             if (description == null) throw new ArgumentNullException(nameof(description));
             if (string.IsNullOrWhiteSpace(outputPath)) throw new ArgumentException("Output path is required.", nameof(outputPath));
-            // Write mesh asynchronously to avoid blocking the UI thread
-            await Task.Run(() =>
+            try
             {
-                var lower = description.ToLowerInvariant();
-                var isSphere = lower.Contains("sphere");
-                using var writer = new StreamWriter(outputPath);
-                if (isSphere)
+                // Write mesh asynchronously to avoid blocking the UI thread
+                await Task.Run(() =>
                 {
-                    WriteSphere(writer, 1.0, 8);
-                }
-                else
-                {
-                    WriteCube(writer, 1.0);
-                }
-            });
+                    var lower = description.ToLowerInvariant();
+                    var isSphere = lower.Contains("sphere");
+                    switch (format)
+                    {
+                        case ModelFormat.Obj:
+                            using (var writer = new StreamWriter(outputPath))
+                            {
+                                if (isSphere)
+                                    WriteSphereObj(writer, 1.0, 8);
+                                else
+                                    WriteCubeObj(writer, 1.0);
+                            }
+                            break;
+                        case ModelFormat.Stl:
+                            using (var writer = new StreamWriter(outputPath))
+                            {
+                                if (isSphere)
+                                    WriteSphereStl(writer, 1.0, 8);
+                                else
+                                    WriteCubeStl(writer, 1.0);
+                            }
+                            break;
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                ErrorLogger.Log(ex);
+                throw;
+            }
         }
 
-        private static void WriteCube(StreamWriter writer, double size)
+        private static void WriteCubeObj(StreamWriter writer, double size)
         {
             double s = size / 2.0;
             // Vertices
@@ -88,7 +112,7 @@ namespace NullAI.Services
             }
         }
 
-        private static void WriteSphere(StreamWriter writer, double radius, int segments)
+        private static void WriteSphereObj(StreamWriter writer, double radius, int segments)
         {
             // Simple UV sphere generation
             for (int i = 0; i <= segments; i++)
@@ -115,6 +139,66 @@ namespace NullAI.Services
                     if ((j + 1) % segments == 0) p4 -= segments;
                     writer.WriteLine("f " + string.Join(" ", new[] { p1, p2, p3, p4 }));
                 }
+            }
+        }
+
+        private static void WriteCubeStl(StreamWriter writer, double size)
+        {
+            double s = size / 2.0;
+            writer.WriteLine("solid cube");
+            void Tri((double,double,double)a,(double,double,double)b,(double,double,double)c)
+            {
+                writer.WriteLine("  facet normal 0 0 0");
+                writer.WriteLine("    outer loop");
+                writer.WriteLine($"      vertex {a.Item1} {a.Item2} {a.Item3}");
+                writer.WriteLine($"      vertex {b.Item1} {b.Item2} {b.Item3}");
+                writer.WriteLine($"      vertex {c.Item1} {c.Item2} {c.Item3}");
+                writer.WriteLine("    endloop");
+                writer.WriteLine("  endfacet");
+            }
+            var v = new (double,double,double)[]{
+                (-s,-s,-s),(s,-s,-s),(s,s,-s),(-s,s,-s),
+                (-s,-s,s),(s,-s,s),(s,s,s),(-s,s,s)
+            };
+            Tri(v[0],v[1],v[2]); Tri(v[0],v[2],v[3]);
+            Tri(v[4],v[5],v[6]); Tri(v[4],v[6],v[7]);
+            Tri(v[0],v[1],v[5]); Tri(v[0],v[5],v[4]);
+            Tri(v[2],v[3],v[7]); Tri(v[2],v[7],v[6]);
+            Tri(v[1],v[2],v[6]); Tri(v[1],v[6],v[5]);
+            Tri(v[0],v[3],v[7]); Tri(v[0],v[7],v[4]);
+            writer.WriteLine("endsolid cube");
+        }
+
+        private static void WriteSphereStl(StreamWriter writer, double radius, int segments)
+        {
+            writer.WriteLine("solid sphere");
+            for (int i = 0; i < segments; i++)
+            {
+                double lat1 = Math.PI * i / segments;
+                double lat2 = Math.PI * (i + 1) / segments;
+                for (int j = 0; j < segments; j++)
+                {
+                    double lon1 = 2 * Math.PI * j / segments;
+                    double lon2 = 2 * Math.PI * (j + 1) / segments;
+                    var p1 = (radius * Math.Sin(lat1) * Math.Cos(lon1), radius * Math.Sin(lat1) * Math.Sin(lon1), radius * Math.Cos(lat1));
+                    var p2 = (radius * Math.Sin(lat2) * Math.Cos(lon1), radius * Math.Sin(lat2) * Math.Sin(lon1), radius * Math.Cos(lat2));
+                    var p3 = (radius * Math.Sin(lat2) * Math.Cos(lon2), radius * Math.Sin(lat2) * Math.Sin(lon2), radius * Math.Cos(lat2));
+                    var p4 = (radius * Math.Sin(lat1) * Math.Cos(lon2), radius * Math.Sin(lat1) * Math.Sin(lon2), radius * Math.Cos(lat1));
+                    WriteTri(writer, p1, p2, p3);
+                    WriteTri(writer, p1, p3, p4);
+                }
+            }
+            writer.WriteLine("endsolid sphere");
+
+            static void WriteTri(StreamWriter w, (double,double,double) a, (double,double,double) b, (double,double,double) c)
+            {
+                w.WriteLine("  facet normal 0 0 0");
+                w.WriteLine("    outer loop");
+                w.WriteLine($"      vertex {a.Item1} {a.Item2} {a.Item3}");
+                w.WriteLine($"      vertex {b.Item1} {b.Item2} {b.Item3}");
+                w.WriteLine($"      vertex {c.Item1} {c.Item2} {c.Item3}");
+                w.WriteLine("    endloop");
+                w.WriteLine("  endfacet");
             }
         }
     }

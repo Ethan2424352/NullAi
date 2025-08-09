@@ -17,6 +17,7 @@ namespace NullAI.Services
 
         private Microsoft.CognitiveServices.Speech.SpeechRecognizer? _recognizer;
         private bool _isListening;
+        private VoiceTrainingService? _trainer;
 
         /// <summary>
         /// Optionally configure the service with Azure Cognitive Services
@@ -35,10 +36,19 @@ namespace NullAI.Services
                     var text = e.Result.Text;
                     if (!string.IsNullOrWhiteSpace(text))
                     {
-                        CommandRecognized?.Invoke(text);
+                        DispatchCommand(text);
                     }
                 }
             };
+        }
+
+        /// <summary>
+        /// Attach a <see cref="VoiceTrainingService"/> to enable custom
+        /// voice command training.
+        /// </summary>
+        public void SetTrainingService(VoiceTrainingService trainer)
+        {
+            _trainer = trainer;
         }
 
         /// <summary>
@@ -74,7 +84,19 @@ namespace NullAI.Services
         /// <param name="command">The recognized command text.</param>
         public void TriggerCommand(string command)
         {
-            CommandRecognized?.Invoke(command);
+            DispatchCommand(command);
+        }
+
+        private void DispatchCommand(string command)
+        {
+            if (_trainer != null && _trainer.TryGetResponse(command, out var response))
+            {
+                CommandRecognized?.Invoke(response);
+            }
+            else
+            {
+                CommandRecognized?.Invoke(command);
+            }
         }
 
         public void Dispose()
