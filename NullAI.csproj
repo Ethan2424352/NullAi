@@ -7,18 +7,21 @@
     <ApplicationIcon>Resources/app_icon.ico</ApplicationIcon>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
-    <ItemGroup>
-      <EmbeddedResource Include="Resources\default_model.obj" />
-      <None Include="Resources\app_icon.ico" />
-      <None Include="Resources\haarcascade_frontalface_default.xml">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <!-- WPF Page items are implicitly included by the SDK; explicit entries removed -->
-    </ItemGroup>
-    <ItemGroup>
-      <PackageReference Include="System.Speech" Version="6.0.0" />
-      <PackageReference Include="Microsoft.CognitiveServices.Speech" Version="1.36.0" />
-      <PackageReference Include="OpenCvSharp4" Version="4.8.0.20230708" />
-      <PackageReference Include="OpenCvSharp4.runtime.anycpu" Version="4.8.0.20230708" />
-    </ItemGroup>
-  </Project>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\default_model.obj" />
+    <None Include="Resources\app_icon.ico" />
+    <None Include="Resources\haarcascade_frontalface_default.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <!-- WPF Page items are implicitly included by the SDK; explicit entries removed -->
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Speech" Version="6.0.0" />
+    <PackageReference Include="Microsoft.CognitiveServices.Speech" Version="1.36.0" />
+    <PackageReference Include="OpenCvSharp4" Version="4.8.0.20230708" />
+    <!-- Native OpenCV binaries for Windows -->
+    <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.8.0.20230708" />
+  </ItemGroup>
+</Project>
